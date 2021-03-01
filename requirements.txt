@@ -1,6 +1,6 @@
 asgiref
 autopep8
-django==2.2.10
+django
 pycodestyle
 pytz
 sqlparse
@@ -9,3 +9,10 @@ dj-database-url
 python-decouple
 gunicorn
 whitenoise
+
+google-api-core
+google-api-python-client
+google-auth
+google-auth-httplib2
+google-auth-oauthlib
+googleapis-common-protos
