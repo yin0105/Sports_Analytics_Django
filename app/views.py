@@ -109,11 +109,10 @@ def dashboard(request, sports):
             for column in values[0]:
                 header_arr.append(column.lower())
             if len(values[0]) == 8 : header_arr.append("day")
-            
+            day = ""
             for row in values[1:]:
                 temp_team_data = {}                
                 for i in range(len(row)):
-                    # print(header_arr[i])
                     if header_arr[i] == "team" and row[i].strip() == "": 
                         temp_team_data = {}
                         break
@@ -123,7 +122,6 @@ def dashboard(request, sports):
                             temp_team_data["mode_aver"] = 0
                         else:
                             mod = re.split(" +", row[i].replace(",", " ").strip())
-                            # if temp_team_data["team"] == "Quinnipiac": print(mod)
                             mod_sum = 0
                             for mod_1 in mod:
                                 mod_sum += float(mod_1)
@@ -133,6 +131,7 @@ def dashboard(request, sports):
                         temp_team_data["mode"] = mod
                     else:
                         temp_team_data[header_arr[i]] = row[i].strip()
+                    if i == 8: day = row[i].replace("-", "/")
                 if len(temp_team_data) == 0: continue
 
                 # Calc Total/Average
@@ -146,18 +145,13 @@ def dashboard(request, sports):
                     if len(team_data) == 2:
                         # Calc & Comp
                         temp_render_data = {}
-                        temp_render_data["date"] = "2021/03/01"
+                        temp_render_data["date"] = day
                         temp_render_data["team_1"] = team_data[0]["team"]
                         temp_render_data["team_2"] = team_data[1]["team"]
-                        # calc_score()
                         temp_render_data["score"] = calc_score()
                         temp_render_data["winner"] = decision_winner()
                         render_data.append(temp_render_data)
                         team_data = []
-                # for v in temp_team_data:
-                #     print(len(v))
-                #     print(v + " : " + temp_team_data[v])
-                # print("::" + temp_team_data["team"] + "::")
         context['segment'] = 'dashboard.html'
         context['data'] = render_data
         print(len(render_data))
@@ -171,14 +165,6 @@ def dashboard(request, sports):
 def calc_score():
     global team_data
     score = 0
-    # print("calc_score() :: ")
-    # print(len(team_data))
-    # print(team_data[0]["mode_aver"])
-    # print(team_data[1]["mode_aver"])
-    # print(team_data[0]["median"])
-    # print(team_data[1]["median"])
-    # print(team_data[0]["mean/avs"])
-    # print(team_data[1]["mean/avs"])
 
     if team_data[0]["mode_aver"] == 0 or team_data[1]["mode_aver"] == 0:
         score = (float(team_data[0]["mean/avs"]) + float(team_data[0]["median"]) + float(team_data[1]["mean/avs"]) + float(team_data[1]["median"])) / 2
