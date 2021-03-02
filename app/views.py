@@ -58,7 +58,9 @@ def dashboard(request, sports):
     print("dashboard::::::::::::::::::")
     global team_data
     context = {}
-    header_arr = []    
+    header_arr = []  
+    render_data = []
+
     try:
         sports      = request.path.split('/')[-1]
 
@@ -121,7 +123,7 @@ def dashboard(request, sports):
                             temp_team_data["mode_aver"] = 0
                         else:
                             mod = re.split(" +", row[i].replace(",", " ").strip())
-                            if temp_team_data["team"] == "Quinnipiac": print(mod)
+                            # if temp_team_data["team"] == "Quinnipiac": print(mod)
                             mod_sum = 0
                             for mod_1 in mod:
                                 mod_sum += float(mod_1)
@@ -129,7 +131,6 @@ def dashboard(request, sports):
                             temp_team_data["mode_aver"] = mod_sum
 
                         temp_team_data["mode"] = mod
-                        # print(temp_team_data[header_arr[i]])
                     else:
                         temp_team_data[header_arr[i]] = row[i].strip()
                 if len(temp_team_data) == 0: continue
@@ -140,23 +141,27 @@ def dashboard(request, sports):
                 else:
                     temp_team_data["ta"] = (float(temp_team_data["mean/avs"]) + float(temp_team_data["median"]) + temp_team_data["mode_aver"]) / 3
                 
-                print(temp_team_data["team"])
-                print(temp_team_data["mode"])
-                # print(len(temp_team_data["mode"]))
                 if len(team_data) < 2:
                     team_data.append(temp_team_data)
                     if len(team_data) == 2:
                         # Calc & Comp
+                        temp_render_data = {}
+                        temp_render_data["date"] = "2021/03/01"
+                        temp_render_data["team_1"] = team_data[0]["team"]
+                        temp_render_data["team_2"] = team_data[1]["team"]
+                        # calc_score()
+                        temp_render_data["score"] = calc_score()
+                        temp_render_data["winner"] = "None"
+                        render_data.append(temp_render_data)
                         team_data = []
                 # for v in temp_team_data:
                 #     print(len(v))
                 #     print(v + " : " + temp_team_data[v])
                 # print("::" + temp_team_data["team"] + "::")
-        print("OK")
         context['segment'] = 'dashboard.html'
-        print("OK_2")
+        context['data'] = render_data
+        print(len(render_data))
         html_template = loader.get_template( 'dashboard.html' )
-        print("OK_3")
         return HttpResponse(html_template.render(context, request))
     except:
         html_template = loader.get_template( 'page-500.html' )
@@ -166,10 +171,20 @@ def dashboard(request, sports):
 def calc_score():
     global team_data
     score = 0
+    # print("calc_score() :: ")
+    # print(len(team_data))
+    # print(team_data[0]["mode_aver"])
+    # print(team_data[1]["mode_aver"])
+    # print(team_data[0]["median"])
+    # print(team_data[1]["median"])
+    # print(team_data[0]["mean/avs"])
+    # print(team_data[1]["mean/avs"])
+
     if team_data[0]["mode_aver"] == 0 or team_data[1]["mode_aver"] == 0:
-        score = (team_data[0]["mean/avs"] + team_data[0]["median"] + team_data[1]["mean/avs"] + team_data[1]["median"]) / 2
+        score = (float(team_data[0]["mean/avs"]) + float(team_data[0]["median"]) + float(team_data[1]["mean/avs"]) + float(team_data[1]["median"])) / 2
     else:
-        score = (team_data[0]["mean/avs"] + team_data[0]["median"] + team_data[0]["mode_aver"] + team_data[1]["mean/avs"] + team_data[1]["median"] + team_data[1]["mode_aver"]) / 3
-    return score
+        score = (float(team_data[0]["mean/avs"]) + float(team_data[0]["median"]) + float(team_data[0]["mode_aver"]) + float(team_data[1]["mean/avs"]) + float(team_data[1]["median"]) + float(team_data[1]["mode_aver"])) / 3
+    # print(score)
+    return "{:.2f}".format(score)
 
 
