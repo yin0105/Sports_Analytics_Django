@@ -67,7 +67,7 @@ def dashboard(request, sports):
         creds = None
         sheet_id =  "1raKXpvMoze4lWoN0f-KZSEy07wrnp9f83FO2UseZKCE"
         sheet_name =  "Sheet1"
-        sheet_range =  "A1:I10000"
+        sheet_range =  "A1:I948"
         print("sheet range = " + sheet_range)
         if os.path.exists('token.pickle'):
             with open('token.pickle', 'rb') as token:
@@ -151,7 +151,7 @@ def dashboard(request, sports):
                         temp_render_data["team_2"] = team_data[1]["team"]
                         # calc_score()
                         temp_render_data["score"] = calc_score()
-                        temp_render_data["winner"] = "None"
+                        temp_render_data["winner"] = decision_winner()
                         render_data.append(temp_render_data)
                         team_data = []
                 # for v in temp_team_data:
@@ -186,5 +186,14 @@ def calc_score():
         score = (float(team_data[0]["mean/avs"]) + float(team_data[0]["median"]) + float(team_data[0]["mode_aver"]) + float(team_data[1]["mean/avs"]) + float(team_data[1]["median"]) + float(team_data[1]["mode_aver"])) / 3
     # print(score)
     return "{:.2f}".format(score)
+
+
+def decision_winner():
+    if float(team_data[0]["variance"]) > float(team_data[1]["variance"]) and team_data[0]["ta"] > team_data[1]["ta"]:
+        return team_data[0]["team"]
+    elif float(team_data[1]["variance"]) > float(team_data[0]["variance"]) and team_data[1]["ta"] > team_data[0]["ta"]:
+        return team_data[1]["team"]
+    else:
+        return ""
 
 
