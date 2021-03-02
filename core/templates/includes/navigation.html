@@ -15,13 +15,13 @@
           <div class="collapse navbar-collapse justify-content-end">
           {% if request.user.is_authenticated %}
 
-            <form class="navbar-form">
+            <form class="navbar-form" name="sports_form" action="/set_sports">
               <div class="input-group no-border">
-                <select class="form-select" aria-label="Default select example">
-                  <option selected>Open this select menu</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
+                <select class="form-select" aria-label="Default select example" name="sports" onchange="sports_form.submit()">
+                  {% for sports in sports_urls %}
+                    <option value="{{sports}}" 
+                    {% if sports == current_sports %} selected="selected"{% endif %}>{{sports}}</option>
+                  {% endfor %}
                 </select>
                 <!-- <input type="text" value="" class="form-control" placeholder="Search...">
                 <button type="submit" class="btn btn-white btn-round btn-just-icon">

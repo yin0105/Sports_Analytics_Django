@@ -14,8 +14,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='SportsURL',
             fields=[
-                ('sports', models.CharField(max_length=20, primary_key=True, serialize=False)),
+                ('sports', models.CharField(max_length=30, primary_key=True, serialize=False)),
                 ('url', models.CharField(max_length=200)),
+                ('sheet', models.CharField(max_length=20)),
             ],
             options={
                 'db_table': 'sportsurl',

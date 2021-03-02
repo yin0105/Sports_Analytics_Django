@@ -10,7 +10,8 @@ urlpatterns = [
 
     # The home page
     path('', views.index, name='home'),
-    path('dashboard/<str:sports>', views.dashboard, name='dashboard'),
+    path('dashboard', views.dashboard, name='dashboard'),
+    path('set_sports', views.set_sports, name='set_sports'),
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 

@@ -5,7 +5,8 @@ from django.contrib.auth.models import User
 
 class SportsURL(models.Model):
 
-   sports = models.CharField(max_length = 20, primary_key = True)
+   sports = models.CharField(max_length = 30, primary_key = True)
    url = models.CharField(max_length = 200)
+   sheet = models.CharField(max_length = 20)
    class Meta:
       db_table = "sportsurl"

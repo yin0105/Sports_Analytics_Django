@@ -74,6 +74,12 @@
   {% include 'includes/scripts-sidebar.html' %}
   
   <!-- Specific Page JS goes HERE  -->
+  <script src="/static/assets/js/navigation.js"></script>
+  <script>
+    function select_sports(sports, sports_url) {
+        console.log(sports + " : " + sports_url);
+    }
+  </script>
   {% block javascripts %}{% endblock javascripts %}
   
 </body>

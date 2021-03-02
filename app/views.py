@@ -16,21 +16,60 @@ from google.auth.transport.requests import Request
 import os, pickle, re
 
 from pyasn1.type.univ import Null
+from app.models import SportsURL
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 team_data = []
+sports_urls = {}
+sports_sheet = {}
+current_sports = ""
+current_page = "dashboard"
 
 @login_required(login_url="/login/")
 def index(request):
+    global sports_urls, sports_sheet, current_sports
     
     context = {}
     context['segment'] = 'index'
 
+    sports_urls_tmp = SportsURL.objects.all()
+    for sports in sports_urls_tmp:
+        if current_sports == "": current_sports = sports
+        sports_urls[sports.sports] = sports.url
+        sports_sheet[sports.sports] = sports.sheet
+        
+    context["sports_urls"] = sports_urls
+    context["current_sports"] = current_sports
+
     html_template = loader.get_template( 'index.html' )
     return HttpResponse(html_template.render(context, request))
 
+
+@login_required(login_url="/login/")
+def set_sports(request):
+    global sports_urls, sports_sheet, current_sports
+    print("set_sports")
+    print(request.GET["sports"])
+    current_sports = request.GET["sports"]
+    print("current_sports = " + current_sports)
+    return redirect(current_page)
+    # context = {}
+    # context['segment'] = 'index'
+
+    # sports_urls_tmp = SportsURL.objects.all()
+    # for sports in sports_urls_tmp:
+    #     if current_sports == "": current_sports = sports
+    #     sports_urls[sports.sports] = sports.url
+        
+    # context["sports_urls"] = sports_urls
+    # context["current_sports"] = current_sports
+
+    # html_template = loader.get_template( 'index.html' )
+    # return HttpResponse(html_template.render(context, request))
+
 @login_required(login_url="/login/")
 def pages(request):
+    global sports_urls, sports_sheet, current_sports
     context = {}
     # All resource paths end in .html.
     # Pick out the html file name from the url. And load that template.
@@ -54,7 +93,8 @@ def pages(request):
 
 
 @login_required(login_url="/login/")
-def dashboard(request, sports):
+def dashboard(request):
+    global sports_urls, sports_sheet, current_sports
     print("dashboard::::::::::::::::::")
     global team_data
     context = {}
@@ -62,12 +102,17 @@ def dashboard(request, sports):
     render_data = []
 
     try:
-        sports      = request.path.split('/')[-1]
+        # sports      = request.path.split('/')[-1]
 
         creds = None
-        sheet_id =  "1raKXpvMoze4lWoN0f-KZSEy07wrnp9f83FO2UseZKCE"
-        sheet_name =  "Sheet1"
-        sheet_range =  "A1:I948"
+        print(current_sports)
+        # sheet_id =  "1raKXpvMoze4lWoN0f-KZSEy07wrnp9f83FO2UseZKCE"
+        # sheet_id =  "1FyYgEeBucZgt3SZZremSmaCL10itggnom4XSjaA9CKw"
+        sheet_id =  sports_urls[current_sports]
+        
+        print(sports_urls[current_sports])
+        sheet_name =  sports_sheet[current_sports]
+        sheet_range =  "A1:I1000"
         print("sheet range = " + sheet_range)
         if os.path.exists('token.pickle'):
             with open('token.pickle', 'rb') as token:
@@ -83,12 +128,12 @@ def dashboard(request, sports):
                     pickle.dump(creds, token)
 
         service = build('sheets', 'v4', credentials=creds)
-
+        print("1")
         # Call the Sheets API
         sheet = service.spreadsheets()
         result = sheet.values().get(spreadsheetId=sheet_id, range=sheet_name + "!" + sheet_range).execute()
         values = result.get('values', [])
-            
+        print("3")
         resp = ""
         # resp = '<iframe src="/static/chart/' + chart_id + '.html" width="100%" height="600px"></iframe>'
         if values:
@@ -113,6 +158,7 @@ def dashboard(request, sports):
             for row in values[1:]:
                 temp_team_data = {}                
                 for i in range(len(row)):
+                    if i>8 : break
                     if header_arr[i] == "team" and row[i].strip() == "": 
                         temp_team_data = {}
                         break
@@ -134,6 +180,8 @@ def dashboard(request, sports):
                     if i == 8: day = row[i].replace("-", "/")
                 if len(temp_team_data) == 0: continue
 
+                print(temp_team_data["team"])
+
                 # Calc Total/Average
                 if temp_team_data["mode_aver"] == 0:
                     temp_team_data["ta"] = (float(temp_team_data["mean/avs"]) + float(temp_team_data["median"])) / 2
@@ -153,6 +201,8 @@ def dashboard(request, sports):
                         render_data.append(temp_render_data)
                         team_data = []
         context['segment'] = 'dashboard.html'
+        context["sports_urls"] = sports_urls
+        context["current_sports"] = current_sports
         context['data'] = render_data
         print(len(render_data))
         html_template = loader.get_template( 'dashboard.html' )
