@@ -34,15 +34,17 @@ def index(request):
 
     sports_urls_tmp = SportsURL.objects.all()
     for sports in sports_urls_tmp:
-        if current_sports == "": current_sports = sports
+        if current_sports == "": current_sports = sports.sports
         sports_urls[sports.sports] = sports.url
         sports_sheet[sports.sports] = sports.sheet
         
     context["sports_urls"] = sports_urls
     context["current_sports"] = current_sports
-
-    html_template = loader.get_template( 'index.html' )
-    return HttpResponse(html_template.render(context, request))
+    print("current sports = " + current_sports)
+    print("redirect")
+    # html_template = loader.get_template( 'dashboard.html' )
+    # return HttpResponse(html_template.render(context, request))
+    return redirect('dashboard')
 
 
 @login_required(login_url="/login/")
@@ -53,19 +55,7 @@ def set_sports(request):
     current_sports = request.GET["sports"]
     print("current_sports = " + current_sports)
     return redirect(current_page)
-    # context = {}
-    # context['segment'] = 'index'
 
-    # sports_urls_tmp = SportsURL.objects.all()
-    # for sports in sports_urls_tmp:
-    #     if current_sports == "": current_sports = sports
-    #     sports_urls[sports.sports] = sports.url
-        
-    # context["sports_urls"] = sports_urls
-    # context["current_sports"] = current_sports
-
-    # html_template = loader.get_template( 'index.html' )
-    # return HttpResponse(html_template.render(context, request))
 
 @login_required(login_url="/login/")
 def pages(request):
@@ -102,10 +92,9 @@ def dashboard(request):
     render_data = []
 
     try:
-        # sports      = request.path.split('/')[-1]
-
         creds = None
-        print(current_sports)
+        print("1")
+        print("current_sports = " + current_sports)
         # sheet_id =  "1raKXpvMoze4lWoN0f-KZSEy07wrnp9f83FO2UseZKCE"
         # sheet_id =  "1FyYgEeBucZgt3SZZremSmaCL10itggnom4XSjaA9CKw"
         sheet_id =  sports_urls[current_sports]
@@ -211,6 +200,40 @@ def dashboard(request):
         html_template = loader.get_template( 'page-500.html' )
         return HttpResponse(html_template.render(context, request))
 
+
+@login_required(login_url="/login/")
+def settings(request):
+    global sports_urls, sports_sheet, current_sports, team_data
+    context = {}
+    header_arr = []  
+    render_data = []
+
+    
+    context['segment'] = 'ui-typography.html'
+    context["sports_urls"] = sports_urls
+    context["current_sports"] = current_sports
+    # context['data'] = render_data
+    print(len(render_data))
+    html_template = loader.get_template( 'settings.html' )
+    return HttpResponse(html_template.render(context, request))
+
+
+@login_required(login_url="/login/")
+def calculator(request):
+    global sports_urls, sports_sheet, current_sports, team_data
+    context = {}
+    header_arr = []  
+    render_data = []
+
+    
+    context['segment'] = 'ui-typography.html'
+    context["sports_urls"] = sports_urls
+    context["current_sports"] = current_sports
+    # context['data'] = render_data
+    print(len(render_data))
+    html_template = loader.get_template( 'ui-typography.html' )
+    return HttpResponse(html_template.render(context, request))
+    
 
 def calc_score():
     global team_data
