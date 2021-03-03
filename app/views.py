@@ -208,11 +208,15 @@ def settings(request):
     render_data = []
 
     
-    context['segment'] = 'ui-typography.html'
-    context["sports_urls"] = sports_urls
+    context['segment'] = 'settings.html'
+    context['sheet_id'] = ''
+    context['sheet_name'] = ''
+    context['sports_urls'] = sports_urls
+
+    if len(sports_urls) > 0 :
+        context['sheet_id'] = sports_urls[current_sports]
+        context['sheet_name'] = sports_sheet[current_sports]
     context["current_sports"] = current_sports
-    # context['data'] = render_data
-    print(len(render_data))
     html_template = loader.get_template( 'settings.html' )
     return HttpResponse(html_template.render(context, request))
 
