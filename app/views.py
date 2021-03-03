@@ -208,14 +208,22 @@ def dashboard(request):
                 if len(team_data) < 2:
                     team_data.append(temp_team_data)
                     if len(team_data) == 2:
-                        # Calc & Comp
+                        # Calc
+                        calc_data = [(float(team_data[0]["mean/avs"]) + float(team_data[1]["mean/avs"])) / 2, (float(team_data[0]["median"]) + float(team_data[1]["median"])) / 2, (float(team_data[0]["mode_aver"]) + float(team_data[1]["mode_aver"])) / 2, (float(team_data[0]["ta"]) + float(team_data[1]["ta"])) / 2]
+                        c_mode = calc_mode(calc_data)
+                        c_mean = calc_mean(calc_data)
+                        c_median = calc_median(calc_data)
+                        if len(c_mode) == 0:
+                            c_score = (c_mean + c_median) / 2
+                        else:
+                            c_score = (c_mean + c_median + calc_mean(c_mode)) / 3
                         temp_render_data = {}
                         temp_render_data["date"] = day
                         temp_render_data["team_1"] = team_data[0]["team"]
                         temp_render_data["team_2"] = team_data[1]["team"]
                         temp_render_data["score_1"] = "{:.2f}".format(team_data[0]["ta"])
                         temp_render_data["score_2"] = "{:.2f}".format(team_data[1]["ta"])
-                        temp_render_data["score"] = calc_score()
+                        temp_render_data["score"] = "{:.2f}".format(c_score)
                         temp_render_data["winner"] = decision_winner()
                         render_data.append(temp_render_data)
                         team_data = []
@@ -258,13 +266,14 @@ def settings(request):
 def calculator(request):
     global sports_urls, sports_sheet, current_sports, current_page, team_data
     context = {}
-    resp = []
-    req = request.GET["data"]
+    resp = [] 
+    req = ""   
     # label_arr = ["Population size:", "Mean (μ):", "Median:", "Mode:", "Lowest value:", "Highest value:", "Range:", "Interquartile range:", "First quartile:", "Third quartile:", "Variance (σ2):", "Standard deviation (σ):", "Quartile deviation:", "Mean absolute deviation (MAD):"]
 
     if "data" in request.GET :
         que_str = re.split(" +", request.GET["data"].replace(",", " ").strip())
-        que = []        
+        que = []      
+        req = request.GET["data"]  
         try :
             for q in que_str:
                 que.append(float(q))
