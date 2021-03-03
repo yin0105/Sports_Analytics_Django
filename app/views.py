@@ -13,7 +13,7 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
-import os, pickle, re
+import os, pickle, re, math
 
 from pyasn1.type.univ import Null
 from app.models import SportsURL
@@ -64,7 +64,6 @@ def set_settings(request):
 
     if request.GET["settings_way"] == "update" :
         try:
-            print("current_sports = " + current_sports)
             cur_sports = SportsURL.objects.get(sports=current_sports)
             cur_sports.sports = request.GET["team"]
             cur_sports.url = request.GET["sheet_id"]
@@ -73,9 +72,13 @@ def set_settings(request):
             cur_sports.rule = request.GET["rule"]
             cur_sports.save()
         except:
-            pass
+            pass    
     elif request.GET["settings_way"] == "add" :
-        pass
+        try:
+            cur_sports = SportsURL(sports = request.GET["team"], url = request.GET["sheet_id"], sheet = request.GET["sheet_name"], victory = request.GET["victory"], rule = request.GET["rule"])
+            cur_sports.save()
+        except:
+            pass
     current_sports = ""
     get_sports_data()
     return redirect('settings')
@@ -210,6 +213,8 @@ def dashboard(request):
                         temp_render_data["date"] = day
                         temp_render_data["team_1"] = team_data[0]["team"]
                         temp_render_data["team_2"] = team_data[1]["team"]
+                        temp_render_data["score_1"] = "{:.2f}".format(team_data[0]["ta"])
+                        temp_render_data["score_2"] = "{:.2f}".format(team_data[1]["ta"])
                         temp_render_data["score"] = calc_score()
                         temp_render_data["winner"] = decision_winner()
                         render_data.append(temp_render_data)
@@ -232,10 +237,6 @@ def settings(request):
     if current_sports == "": get_sports_data()
     current_page = "settings"
     context = {}
-    header_arr = []  
-    render_data = []
-
-    
     context['segment'] = 'settings.html'
     context['sheet_id'] = ''
     context['sheet_name'] = ''
@@ -257,16 +258,70 @@ def settings(request):
 def calculator(request):
     global sports_urls, sports_sheet, current_sports, current_page, team_data
     context = {}
-    header_arr = []  
-    render_data = []
+    resp = []
+    label_arr = ["Population size:", "Mean (μ):", "Median:", "Mode:", "Lowest value:", "Highest value:", "Range:", "Interquartile range:", "First quartile:", "Third quartile:", "Variance (σ2):", "Standard deviation (σ):", "Quartile deviation:", "Mean absolute deviation (MAD):"]
 
+    if "data" in request.GET :
+        que_str = re.split(" +", request.GET["data"].replace(",", " ").strip())
+        que = []        
+        try :
+            for q in que_str:
+                que.append(float(q))
+            # Population size
+            resp.append({"label":"Population size:", "val":len(que)})
+            # Mean (μ)
+            resp.append({"label":"Mean (μ):", "val":calc_mean(que)})
+            # Median
+            resp.append({"label":"Median:", "val":calc_median(que)})
+            # Mode
+            resp.append({"label":"Mode:", "val":calc_mode(que)})
+            # Lowest value
+            resp.append({"label":"Lowest value:", "val":calc_lowest(que)})
+            # Highest value
+            resp.append({"label":"Highest value:", "val":calc_highest(que)})
+            # Range
+            resp.append({"label":"Range:", "val":calc_range(que)})
+            # Interquartile range
+            resp.append({"label":"Interquartile range:", "val":calc_inter_q(que)})
+            # First quartile
+            resp.append({"label":"First quartile:", "val":calc_first_q(que)})
+            # Third quartile
+            resp.append({"label":"Third quartile:", "val":calc_third_q(que)})
+            # Variance (σ2)
+            resp.append({"label":"Variance (σ2):", "val":calc_variance(que)})
+            # Standard deviation (σ)
+            resp.append({"label":"Standard deviation (σ):", "val":calc_sd(que)})
+            # Quartile deviation
+            resp.append({"label":"Quartile deviation:", "val":calc_qv(que)})
+            # Mean absolute deviation (MAD)
+            resp.append({"label":"Mean absolute deviation (MAD):", "val":calc_mad(que)})
+        except :
+            pass
+    if len(resp) < 14 :
+        print("except")
+        resp.clear()
+        resp.append({"label":"Population size:", "val":""})
+        resp.append({"label":"Mean (μ):", "val":""})
+        resp.append({"label":"Median:", "val":""})
+        resp.append({"label":"Mode:", "val":""})
+        resp.append({"label":"Lowest value:", "val":""})
+        resp.append({"label":"Highest value:", "val":""})
+        resp.append({"label":"Range:", "val":""})
+        resp.append({"label":"Interquartile range:", "val":""})
+        resp.append({"label":"First quartile:", "val":""})
+        resp.append({"label":"Third quartile:", "val":""})
+        resp.append({"label":"Variance (σ2):", "val":""})
+        resp.append({"label":"Standard deviation (σ):", "val":""})
+        resp.append({"label":"Quartile deviation:", "val":""})
+        resp.append({"label":"Mean absolute deviation (MAD):", "val":""})
+        
     
-    context['segment'] = 'ui-typography.html'
-    context["sports_urls"] = sports_urls
-    context["current_sports"] = current_sports
-    # context['data'] = render_data
-    print(len(render_data))
-    html_template = loader.get_template( 'ui-typography.html' )
+    context['segment'] = 'calculator.html'
+    context["resp"] = resp
+    context["label_arr"] = label_arr
+    print("$"*50)
+    print(len(resp))
+    html_template = loader.get_template( 'calculator.html' )
     return HttpResponse(html_template.render(context, request))
     
 
@@ -303,3 +358,102 @@ def get_sports_data():
         sports_rule[sports.sports] = sports.rule
         sports_victory[sports.sports] = sports.victory
 
+
+def calc_mean(que):
+    s = 0
+    for q in que:
+        s += q
+    return s/len(que)
+
+
+def calc_median(que):
+    que.sort()
+    n = len(que)
+    print("n = " + str(n))
+    print(que)
+    if n % 2 == 0:
+        return (que[n//2-1] + que[n//2]) / 2
+    else:
+        return que[(n-1)//2]
+
+
+def calc_mode(que):
+    que.sort()
+    res_que = []
+    pre_q = que[0]
+    repeat_count = 1
+    max_repeat_count = 2
+    for q in que[1:]:
+        if pre_q == q:
+            repeat_count += 1
+        else:
+            if repeat_count == max_repeat_count :
+                res_que.append(pre_q)
+            elif repeat_count > max_repeat_count :
+                max_repeat_count = repeat_count
+                res_que.clear()
+                res_que.append(pre_q)
+            repeat_count = 1
+            pre_q = q
+    
+    return res_que
+
+
+def calc_lowest(que):
+    que.sort()
+    return que[0]
+
+
+def calc_highest(que):
+    que.sort()
+    return que[-1]
+
+
+def calc_range(que):
+    que.sort()
+    return que[-1] - que[0]
+
+
+def calc_inter_q(que):
+    return calc_third_q(que) - calc_first_q(que)
+
+def calc_first_q(que):
+    que.sort()
+    n = len(que)
+    if (n+1) % 4 == 0:
+        return que[(n+1)//4 - 1]
+    return que[(n+1)//4 - 1] + (que[(n+1)//4] - que[(n+1)//4 - 1]) * ((n+1)/4 - (n+1)//4)
+
+
+def calc_third_q(que):
+    que.sort()
+    n = len(que)
+    if (n+1) % 4 == 0:
+        return que[(n+1) // 4 * 3 - 1]
+    return que[(n+1)//4*3 - 1] + (que[(n+1)//4*3] - que[(n+1)//4*3 - 1]) * ((n+1)/4*3 - (n+1)//4*3)
+
+
+def calc_variance(que):
+    mean = calc_mean(que)
+    s = 0
+    for q in que:
+        s += (q - mean) ** 2
+    s = s / ( len(que) - 1 )
+    return s
+
+
+def calc_sd(que):
+    return math.sqrt(calc_variance(que))
+
+
+def calc_qv(que):
+    return calc_inter_q(que) / 2
+
+
+def calc_mad(que): 
+    print("calc_mad")
+    mean = calc_mean(que)
+    print(mean)
+    que_2 = [abs(q - mean) for q in que]                                      
+    print(que_2)
+    return calc_mean(que_2)

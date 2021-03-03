@@ -27,7 +27,7 @@
                           TEAM 2
                         </th>
                         <th>
-                          SCORE PREDICTION
+                          EXPECTED SCORE
                         </th>
                         <th>
                           WINNER PREDICTION
@@ -37,8 +37,8 @@
                         {% for row in data %}
                           <tr>
                             <td>{{ row.date }}</td>
-                            <td>{{ row.team_1 }}</td>
-                            <td>{{ row.team_2 }}</td>
+                            <td>{{ row.team_1 }}<br>{{ row.score_1 }}</td>
+                            <td>{{ row.team_2 }}<br>{{ row.score_2 }}</td>
                             <td class="text-primary">{{ row.score }}</td>
                             <td class="text-primary">{{ row.winner }}</td>
                           </tr>
