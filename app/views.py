@@ -210,13 +210,16 @@ def dashboard(request):
                     if len(team_data) == 2:
                         # Calc
                         calc_data = [(float(team_data[0]["mean/avs"]) + float(team_data[1]["mean/avs"])) / 2, (float(team_data[0]["median"]) + float(team_data[1]["median"])) / 2, (float(team_data[0]["mode_aver"]) + float(team_data[1]["mode_aver"])) / 2, (float(team_data[0]["ta"]) + float(team_data[1]["ta"])) / 2]
-                        c_mode = calc_mode(calc_data)
-                        c_mean = calc_mean(calc_data)
-                        c_median = calc_median(calc_data)
-                        if len(c_mode) == 0:
-                            c_score = (c_mean + c_median) / 2
+                        mode = calc_mode(calc_data)
+                        mean = calc_mean(calc_data)
+                        median = calc_median(calc_data)
+                        variance = calc_variance(calc_data)
+                        sd = calc_sd(calc_data)
+                        mad = calc_mad(calc_data)
+                        if len(mode) == 0:
+                            c_score = (mean + median) / 2
                         else:
-                            c_score = (c_mean + c_median + calc_mean(c_mode)) / 3
+                            c_score = (mean + median + calc_mean(mode)) / 3
                         temp_render_data = {}
                         temp_render_data["date"] = day
                         temp_render_data["team_1"] = team_data[0]["team"]
@@ -224,7 +227,12 @@ def dashboard(request):
                         temp_render_data["score_1"] = "{:.2f}".format(team_data[0]["ta"])
                         temp_render_data["score_2"] = "{:.2f}".format(team_data[1]["ta"])
                         temp_render_data["score"] = "{:.2f}".format(c_score)
-                        temp_render_data["winner"] = decision_winner()
+                        
+                        temp_render_data["winner"] = ""
+                        # rule
+                        if eval(sports_rule[current_sports]) :
+                            temp_render_data["winner"] = decision_winner(sports_victory[current_sports])
+
                         render_data.append(temp_render_data)
                         team_data = []
         context['segment'] = 'dashboard.html'
@@ -351,14 +359,25 @@ def calc_score():
     return "{:.2f}".format(score)
 
 
-def decision_winner():
+def decision_winner(v):
     global team_data
-    if float(team_data[0]["variance"]) > float(team_data[1]["variance"]) and team_data[0]["ta"] > team_data[1]["ta"]:
-        return team_data[0]["team"]
-    elif float(team_data[1]["variance"]) > float(team_data[0]["variance"]) and team_data[1]["ta"] > team_data[0]["ta"]:
-        return team_data[1]["team"]
+    if v == 0:
+        if float(team_data[0]["variance"]) > float(team_data[1]["variance"]) and team_data[0]["ta"] > team_data[1]["ta"]:
+            return team_data[0]["team"]
+        elif float(team_data[1]["variance"]) > float(team_data[0]["variance"]) and team_data[1]["ta"] > team_data[0]["ta"]:
+            return team_data[1]["team"]
+    elif v == 1:
+        if float(team_data[0]["variance"]) > float(team_data[1]["variance"]):
+            return team_data[0]["team"]
+        elif float(team_data[1]["variance"]) > float(team_data[0]["variance"]):
+            return team_data[1]["team"]
     else:
-        return ""
+        if team_data[0]["ta"] > team_data[1]["ta"]:
+            return team_data[0]["team"]
+        elif team_data[1]["ta"] > team_data[0]["ta"]:
+            return team_data[1]["team"]
+    
+    return ""
 
 
 def get_sports_data():
