@@ -1,0 +1,97 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Page User {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+          <div class="row justify-content-md-center">     
+            <div class="col-md-8">
+              <div class="card">
+                <div class="card-header card-header-primary">
+                  <h4 class="card-title">Edit Profile</h4>
+                  <p class="card-category">Complete your profile</p>
+                </div>
+                <div class="card-body">
+                  <form>
+                    <div class="row justify-content-md-center">
+                      <div class="col-md-8 mt-5">
+                        <div class="form-group">
+                          <label class="bmd-label-floating">Team Name : </label>
+                          <input type="text" class="form-control" value="{{ current_user.username }}">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row justify-content-md-center">
+                      <div class="col-md-8 mt-4">
+                        <div class="form-group">
+                          <label class="bmd-label-floating">Sheet ID : </label>
+                          <input type="text" class="form-control" value="{{ current_user.username }}">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row justify-content-md-center">
+                      <div class="col-md-8 mt-4">
+                        <div class="form-group">
+                          <label class="bmd-label-floating">Sheet Name : </label>
+                          <input type="text" class="form-control" value="{{ current_user.username }}">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row justify-content-md-center">
+                      <div class="col-md-8 mt-4">
+                        <div class="form-group">
+                          <label class="bmd-label-floating">Rule : </label>
+                          <input type="text" class="form-control" value="{{ current_user.username }}">
+                        </div>
+                      </div>
+                      <div class="col-md-6 rule-comment">
+                        <i class="material-icons">warning</i>
+                        <label>Only "Mode" and "Median" can be used in the rule.</label>
+                      </div>
+                    </div>
+
+                    <div class="row justify-content-md-center">
+                      <div class="col-md-8 mt-4">
+                        <!-- <div class="form-group"> -->
+                          <label class="bmd-label-floating">Victory Condition : </label>
+                          <select class="form-select" aria-label="victory_condition" name="victory" onchange="">
+                            <option value="0">If the variance is larger and the total average score is higher, you win</option>
+                            <option value="1">If the variance is larger, you win</option>
+                            <option value="2">If the total average score is higher, you win</option>
+                          </select>
+                        <!-- </div> -->
+                      </div>
+                    </div>
+                    
+                    <div class="row justify-content-md-center">
+                      <div class="col-md-3 my-4">
+                        <div class="form-group">
+                          <button type="submit" class="btn btn-primary pull-right">Add Info</button>
+                        </div>
+                      </div>
+                      <div class="col-md-3 my-4">
+                        <div class="form-group">
+                          <button type="submit" class="btn btn-primary pull-right">Update Info</button>
+                        </div>
+                      </div>
+                        
+                      </div>
+                    </div>
+                    
+                    <div class="clearfix"></div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
