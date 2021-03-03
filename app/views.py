@@ -27,16 +27,12 @@ current_page = "dashboard"
 
 @login_required(login_url="/login/")
 def index(request):
-    global sports_urls, sports_sheet, current_sports
+    global sports_urls, sports_sheet, current_sports, current_page, team_data
     
     context = {}
     context['segment'] = 'index'
 
-    sports_urls_tmp = SportsURL.objects.all()
-    for sports in sports_urls_tmp:
-        if current_sports == "": current_sports = sports.sports
-        sports_urls[sports.sports] = sports.url
-        sports_sheet[sports.sports] = sports.sheet
+    get_sports_data()
         
     context["sports_urls"] = sports_urls
     context["current_sports"] = current_sports
@@ -49,7 +45,7 @@ def index(request):
 
 @login_required(login_url="/login/")
 def set_sports(request):
-    global sports_urls, sports_sheet, current_sports
+    global sports_urls, sports_sheet, current_sports, current_page, team_data
     print("set_sports")
     print(request.GET["sports"])
     current_sports = request.GET["sports"]
@@ -59,7 +55,7 @@ def set_sports(request):
 
 @login_required(login_url="/login/")
 def pages(request):
-    global sports_urls, sports_sheet, current_sports
+    global sports_urls, sports_sheet, current_sports, current_page, team_data
     context = {}
     # All resource paths end in .html.
     # Pick out the html file name from the url. And load that template.
@@ -84,9 +80,10 @@ def pages(request):
 
 @login_required(login_url="/login/")
 def dashboard(request):
-    global sports_urls, sports_sheet, current_sports
+    global sports_urls, sports_sheet, current_sports, current_page, team_data
     print("dashboard::::::::::::::::::")
-    global team_data
+    if current_sports == "": get_sports_data()
+    current_page = "dashboard"
     context = {}
     header_arr = []  
     render_data = []
@@ -203,7 +200,9 @@ def dashboard(request):
 
 @login_required(login_url="/login/")
 def settings(request):
-    global sports_urls, sports_sheet, current_sports, team_data
+    global sports_urls, sports_sheet, current_sports, current_page, team_data
+    if current_sports == "": get_sports_data()
+    current_page = "settings"
     context = {}
     header_arr = []  
     render_data = []
@@ -220,7 +219,7 @@ def settings(request):
 
 @login_required(login_url="/login/")
 def calculator(request):
-    global sports_urls, sports_sheet, current_sports, team_data
+    global sports_urls, sports_sheet, current_sports, current_page, team_data
     context = {}
     header_arr = []  
     render_data = []
@@ -248,6 +247,7 @@ def calc_score():
 
 
 def decision_winner():
+    global team_data
     if float(team_data[0]["variance"]) > float(team_data[1]["variance"]) and team_data[0]["ta"] > team_data[1]["ta"]:
         return team_data[0]["team"]
     elif float(team_data[1]["variance"]) > float(team_data[0]["variance"]) and team_data[1]["ta"] > team_data[0]["ta"]:
@@ -256,3 +256,10 @@ def decision_winner():
         return ""
 
 
+def get_sports_data():
+    global sports_urls, sports_sheet, current_sports
+    sports_urls_tmp = SportsURL.objects.all()
+    for sports in sports_urls_tmp:
+        if current_sports == "": current_sports = sports.sports
+        sports_urls[sports.sports] = sports.url
+        sports_sheet[sports.sports] = sports.sheet
