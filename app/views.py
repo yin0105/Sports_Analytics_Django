@@ -1,10 +1,5 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
-
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.template import loader
 from django.http import HttpResponse
 from django import template
@@ -31,17 +26,13 @@ current_page = "dashboard"
 def index(request):
     global sports_urls, sports_sheet, current_sports, current_page, team_data
     
+    get_sports_data()
+    
     context = {}
     context['segment'] = 'index'
-
-    get_sports_data()
-        
     context["sports_urls"] = sports_urls
     context["current_sports"] = current_sports
-    print("current sports = " + current_sports)
-    print("redirect")
-    # html_template = loader.get_template( 'dashboard.html' )
-    # return HttpResponse(html_template.render(context, request))
+
     return redirect('dashboard')
 
 
@@ -55,12 +46,6 @@ def set_sports(request):
 @login_required(login_url="/login/")
 def set_settings(request):
     global current_sports
-    print(request.GET["team"])
-    print(request.GET["sheet_id"])
-    print(request.GET["sheet_name"])
-    print(request.GET["rule"])
-    print(request.GET["victory"])
-    print(request.GET["settings_way"])
 
     if request.GET["settings_way"] == "update" :
         try:
@@ -84,35 +69,10 @@ def set_settings(request):
     return redirect('settings')
 
 
-@login_required(login_url="/login/")
-def pages(request):
-    global sports_urls, sports_sheet, current_sports, current_page, team_data
-    context = {}
-    # All resource paths end in .html.
-    # Pick out the html file name from the url. And load that template.
-    try:
-        
-        load_template      = request.path.split('/')[-1]
-        context['segment'] = load_template
-        
-        html_template = loader.get_template( load_template )
-        return HttpResponse(html_template.render(context, request))
-        
-    except template.TemplateDoesNotExist:
-
-        html_template = loader.get_template( 'page-404.html' )
-        return HttpResponse(html_template.render(context, request))
-
-    except:
-    
-        html_template = loader.get_template( 'page-500.html' )
-        return HttpResponse(html_template.render(context, request))
-
 
 @login_required(login_url="/login/")
 def dashboard(request):
     global sports_urls, sports_sheet, current_sports, current_page, team_data
-    print("dashboard::::::::::::::::::")
     if current_sports == "": get_sports_data()
     current_page = "dashboard"
     context = {}
@@ -121,16 +81,9 @@ def dashboard(request):
 
     try:
         creds = None
-        print("1")
-        print("current_sports = " + current_sports)
-        # sheet_id =  "1raKXpvMoze4lWoN0f-KZSEy07wrnp9f83FO2UseZKCE"
-        # sheet_id =  "1FyYgEeBucZgt3SZZremSmaCL10itggnom4XSjaA9CKw"
         sheet_id =  sports_urls[current_sports]
-        
-        print(sports_urls[current_sports])
         sheet_name =  sports_sheet[current_sports]
         sheet_range =  "A1:I1000"
-        print("sheet range = " + sheet_range)
         if os.path.exists('token.pickle'):
             with open('token.pickle', 'rb') as token:
                 creds = pickle.load(token)
@@ -145,28 +98,13 @@ def dashboard(request):
                     pickle.dump(creds, token)
 
         service = build('sheets', 'v4', credentials=creds)
-        print("1")
+
         # Call the Sheets API
         sheet = service.spreadsheets()
         result = sheet.values().get(spreadsheetId=sheet_id, range=sheet_name + "!" + sheet_range).execute()
         values = result.get('values', [])
-        print("3")
         resp = ""
-        # resp = '<iframe src="/static/chart/' + chart_id + '.html" width="100%" height="600px"></iframe>'
         if values:
-            print(len(values))
-            # From To (Change Field Name)
-            # fields = Field.query.join(Field_Type, Field.field_type==Field_Type.id).add_columns(Field.from_, Field.to, Field.rule, Field_Type.field_type).filter(Field.tbl_id==tbl_id).all()
-            # print("tbl_id = " + str(tbl_id))
-            # new_values = []
-            # new_columns = [] # fields name list
-            # index_columns = [] # indexes list
-            # name_columns = {} # name mapping dictionary (field name -> virtual variable name that will be used in expression)
-            # rule_columns = []
-            # type_columns = []
-            # col_index = -1
-            # field_index = -1
-            
             # Get Header 
             for column in values[0]:
                 header_arr.append(column.lower())
@@ -196,8 +134,6 @@ def dashboard(request):
                         temp_team_data[header_arr[i]] = row[i].strip()
                     if i == 8: day = row[i].replace("-", "/")
                 if len(temp_team_data) == 0: continue
-
-                print(temp_team_data["team"])
 
                 # Calc Total/Average
                 if temp_team_data["mode_aver"] == 0:
@@ -239,7 +175,6 @@ def dashboard(request):
         context["sports_urls"] = sports_urls
         context["current_sports"] = current_sports
         context['data'] = render_data
-        print(len(render_data))
         html_template = loader.get_template( 'dashboard.html' )
         return HttpResponse(html_template.render(context, request))
     except:
@@ -276,7 +211,6 @@ def calculator(request):
     context = {}
     resp = [] 
     req = ""   
-    # label_arr = ["Population size:", "Mean (μ):", "Median:", "Mode:", "Lowest value:", "Highest value:", "Range:", "Interquartile range:", "First quartile:", "Third quartile:", "Variance (σ2):", "Standard deviation (σ):", "Quartile deviation:", "Mean absolute deviation (MAD):"]
 
     if "data" in request.GET :
         que_str = re.split(" +", request.GET["data"].replace(",", " ").strip())
@@ -336,13 +270,10 @@ def calculator(request):
         resp.append({"label":"Standard deviation (σ):", "val":""})
         resp.append({"label":"Quartile deviation:", "val":""})
         resp.append({"label":"Mean absolute deviation (MAD):", "val":""})
-        
     
     context['segment'] = 'calculator.html'
     context["resp"] = resp
     context["req"] = req
-    print("$"*50)
-    print(len(resp))
     html_template = loader.get_template( 'calculator.html' )
     return HttpResponse(html_template.render(context, request))
     
@@ -355,7 +286,6 @@ def calc_score():
         score = (float(team_data[0]["mean/avs"]) + float(team_data[0]["median"]) + float(team_data[1]["mean/avs"]) + float(team_data[1]["median"])) / 2
     else:
         score = (float(team_data[0]["mean/avs"]) + float(team_data[0]["median"]) + float(team_data[0]["mode_aver"]) + float(team_data[1]["mean/avs"]) + float(team_data[1]["median"]) + float(team_data[1]["mode_aver"])) / 3
-    # print(score)
     return "{:.2f}".format(score)
 
 
@@ -402,8 +332,6 @@ def calc_mean(que):
 def calc_median(que):
     que.sort()
     n = len(que)
-    print("n = " + str(n))
-    print(que)
     if n % 2 == 0:
         return (que[n//2-1] + que[n//2]) / 2
     else:
@@ -492,9 +420,6 @@ def calc_qv(que):
 
 
 def calc_mad(que): 
-    print("calc_mad")
     mean = calc_mean(que)
-    print(mean)
     que_2 = [abs(q - mean) for q in que]                                      
-    print(que_2)
     return calc_mean(que_2)

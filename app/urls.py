@@ -7,15 +7,11 @@ from django.urls import path, re_path
 from app import views
 
 urlpatterns = [
-
-    # The home page
     path('', views.index, name='home'),
     path('dashboard', views.dashboard, name='dashboard'),
     path('settings', views.settings, name='settings'),
     path('calculator', views.calculator, name='calculator'),
     path('set_sports', views.set_sports, name='set_sports'),
     path('set_settings', views.set_settings, name='set_settings'),
-    # Matches any html file
-    re_path(r'^.*\.*', views.pages, name='pages'),
 
 ]
