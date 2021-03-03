@@ -22,6 +22,8 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 team_data = []
 sports_urls = {}
 sports_sheet = {}
+sports_rule = {}
+sports_victory = {}
 current_sports = ""
 current_page = "dashboard"
 
@@ -200,7 +202,7 @@ def dashboard(request):
 
 @login_required(login_url="/login/")
 def settings(request):
-    global sports_urls, sports_sheet, current_sports, current_page, team_data
+    global sports_urls, sports_sheet, sports_victory, sports_rule, current_sports, current_page, team_data
     if current_sports == "": get_sports_data()
     current_page = "settings"
     context = {}
@@ -211,11 +213,15 @@ def settings(request):
     context['segment'] = 'settings.html'
     context['sheet_id'] = ''
     context['sheet_name'] = ''
+    context['rule'] = ''
+    context['victory'] = 0
     context['sports_urls'] = sports_urls
 
     if len(sports_urls) > 0 :
         context['sheet_id'] = sports_urls[current_sports]
         context['sheet_name'] = sports_sheet[current_sports]
+        context['rule'] = sports_rule[current_sports]
+        context['victory'] = sports_victory[current_sports]
     context["current_sports"] = current_sports
     html_template = loader.get_template( 'settings.html' )
     return HttpResponse(html_template.render(context, request))
@@ -267,3 +273,6 @@ def get_sports_data():
         if current_sports == "": current_sports = sports.sports
         sports_urls[sports.sports] = sports.url
         sports_sheet[sports.sports] = sports.sheet
+        sports_rule[sports.sports] = sports.rule
+        sports_victory[sports.sports] = sports.victory
+

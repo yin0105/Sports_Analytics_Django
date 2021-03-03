@@ -47,7 +47,7 @@
                       <div class="col-md-8 mt-4">
                         <div class="form-group">
                           <label class="bmd-label-floating">Rule : </label>
-                          <input type="text" class="form-control" value="{{ current_user.username }}">
+                          <input type="text" class="form-control" value="{{ rule }}">
                         </div>
                       </div>
                       <div class="col-md-6 rule-comment">
@@ -61,9 +61,9 @@
                         <!-- <div class="form-group"> -->
                           <label class="bmd-label-floating">Victory Condition : </label>
                           <select class="form-select" aria-label="victory_condition" name="victory" onchange="">
-                            <option value="0">If the variance is larger and the total average score is higher, you win</option>
-                            <option value="1">If the variance is larger, you win</option>
-                            <option value="2">If the total average score is higher, you win</option>
+                            <option value="0" {% if victory == 0 %} selected="selected"{% endif %}>If the variance is larger and the total average score is higher, you win</option>
+                            <option value="1" {% if victory == 1 %} selected="selected"{% endif %}>If the variance is larger, you win</option>
+                            <option value="2" {% if victory == 2 %} selected="selected"{% endif %}>If the total average score is higher, you win</option>
                           </select>
                         <!-- </div> -->
                       </div>
