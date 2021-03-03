@@ -1,0 +1,63 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Page User {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+          <div class="row justify-content-md-center">     
+            <div class="col-md-8">
+              <div class="card">
+                <div class="card-header card-header-primary">
+                  <h4 class="card-title">Statistics Calculator</h4>
+                  <p class="card-category">calculate from given data</p>
+                </div>
+                <div class="card-body">
+                  {% for row in resp %}
+                    <div class="row justify-content-md-center">
+                      <div class="col-md-4">
+                        <label>{{ row.label }}</label>
+                      </div>
+                      <div class="col-md-2">
+                        <label id="pop_size">{{ row.val }}</label>
+                      </div>
+                    </div>
+                  {% endfor %}
+
+                  <form action="/calculator" name="calc_form" method="GET">
+                    <div class="row justify-content-md-center">
+                      <div class="col-md-6 mt-4">
+                        <div class="form-group" style="justify-content: center;text-align: center;display: flex;">
+                          <textarea cols="60" rows="8" id="data" name="data"></textarea>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row justify-content-md-center">
+                      <div class="col-md-3 mb-4">
+                        <div class="form-group" style="justify-content: center;text-align: center;display: flex;">
+                          <button type="submit" class="btn btn-primary pull-right">Calculate</button>
+                        </div>
+                      </div>
+                      <div class="col-md-3 mb-4" style="justify-content: center;text-align: center;display: flex;">
+                        <div class="form-group">
+                          <button type="reset" class="btn btn-primary pull-right">Reset</button>
+                        </div>
+                      </div>
+                        
+                      </div>
+                    </div>
+                    
+                    <div class="clearfix"></div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
