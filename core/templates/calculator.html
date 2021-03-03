@@ -14,7 +14,7 @@
                   <h4 class="card-title">Statistics Calculator</h4>
                   <p class="card-category">calculate from given data</p>
                 </div>
-                <div class="card-body">
+                <div class="card-body mt-4">
                   {% for row in resp %}
                     <div class="row justify-content-md-center">
                       <div class="col-md-4">
@@ -30,7 +30,7 @@
                     <div class="row justify-content-md-center">
                       <div class="col-md-6 mt-4">
                         <div class="form-group" style="justify-content: center;text-align: center;display: flex;">
-                          <textarea cols="60" rows="8" id="data" name="data"></textarea>
+                          <textarea cols="60" rows="8" id="data" name="data">{{ req }}</textarea>
                         </div>
                       </div>
                     </div>
@@ -43,7 +43,7 @@
                       </div>
                       <div class="col-md-3 mb-4" style="justify-content: center;text-align: center;display: flex;">
                         <div class="form-group">
-                          <button type="reset" class="btn btn-primary pull-right">Reset</button>
+                          <button type="button" class="btn btn-primary pull-right" onclick="reset_calc()">Reset</button>
                         </div>
                       </div>
                         

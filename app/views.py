@@ -259,7 +259,8 @@ def calculator(request):
     global sports_urls, sports_sheet, current_sports, current_page, team_data
     context = {}
     resp = []
-    label_arr = ["Population size:", "Mean (μ):", "Median:", "Mode:", "Lowest value:", "Highest value:", "Range:", "Interquartile range:", "First quartile:", "Third quartile:", "Variance (σ2):", "Standard deviation (σ):", "Quartile deviation:", "Mean absolute deviation (MAD):"]
+    req = request.GET["data"]
+    # label_arr = ["Population size:", "Mean (μ):", "Median:", "Mode:", "Lowest value:", "Highest value:", "Range:", "Interquartile range:", "First quartile:", "Third quartile:", "Variance (σ2):", "Standard deviation (σ):", "Quartile deviation:", "Mean absolute deviation (MAD):"]
 
     if "data" in request.GET :
         que_str = re.split(" +", request.GET["data"].replace(",", " ").strip())
@@ -274,7 +275,11 @@ def calculator(request):
             # Median
             resp.append({"label":"Median:", "val":calc_median(que)})
             # Mode
-            resp.append({"label":"Mode:", "val":calc_mode(que)})
+            print(calc_mode(que))
+            temp = ', '.join([str(i) for i in calc_mode(que)])
+            print(temp)
+            if temp == "": temp = "No"
+            resp.append({"label":"Mode:", "val":temp})
             # Lowest value
             resp.append({"label":"Lowest value:", "val":calc_lowest(que)})
             # Highest value
@@ -298,7 +303,7 @@ def calculator(request):
         except :
             pass
     if len(resp) < 14 :
-        print("except")
+        print("except" + str(len(resp)))
         resp.clear()
         resp.append({"label":"Population size:", "val":""})
         resp.append({"label":"Mean (μ):", "val":""})
@@ -318,7 +323,7 @@ def calculator(request):
     
     context['segment'] = 'calculator.html'
     context["resp"] = resp
-    context["label_arr"] = label_arr
+    context["req"] = req
     print("$"*50)
     print(len(resp))
     html_template = loader.get_template( 'calculator.html' )
@@ -415,9 +420,13 @@ def calc_range(que):
 
 
 def calc_inter_q(que):
+    if len(que) < 4:
+        return "N/A"
     return calc_third_q(que) - calc_first_q(que)
 
 def calc_first_q(que):
+    if len(que) < 4:
+        return "N/A"
     que.sort()
     n = len(que)
     if (n+1) % 4 == 0:
@@ -426,6 +435,8 @@ def calc_first_q(que):
 
 
 def calc_third_q(que):
+    if len(que) < 4:
+        return "N/A"
     que.sort()
     n = len(que)
     if (n+1) % 4 == 0:
@@ -447,6 +458,8 @@ def calc_sd(que):
 
 
 def calc_qv(que):
+    if len(que) < 4:
+        return "N/A"
     return calc_inter_q(que) / 2
 
 
