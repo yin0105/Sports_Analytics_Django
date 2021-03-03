@@ -47,11 +47,15 @@ def index(request):
 
 @login_required(login_url="/login/")
 def set_sports(request):
-    global sports_urls, sports_sheet, current_sports, current_page, team_data
-    print("set_sports")
-    print(request.GET["sports"])
+    global current_sports
     current_sports = request.GET["sports"]
-    print("current_sports = " + current_sports)
+    return redirect(current_page)
+
+
+@login_required(login_url="/login/")
+def set_settings(request):
+    global current_sports
+    print(request.GET["team"])
     return redirect(current_page)
 
 

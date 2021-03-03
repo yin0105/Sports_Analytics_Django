@@ -15,7 +15,8 @@
                   <p class="card-category">Provide Sports Information Here.</p>
                 </div>
                 <div class="card-body">
-                  <form>
+                  <form action="/set_settings" name="myform">
+                    <input type="hidden" name="way" value="update">
                     <div class="row justify-content-md-center">
                       <div class="col-md-8 mt-5">
                         <div class="form-group">
@@ -47,7 +48,7 @@
                       <div class="col-md-8 mt-4">
                         <div class="form-group">
                           <label class="bmd-label-floating">Rule : </label>
-                          <input type="text" class="form-control" value="{{ rule }}">
+                          <input type="text" class="form-control" name="rule" value="{{ rule }}">
                         </div>
                       </div>
                       <div class="col-md-6 rule-comment">
@@ -72,7 +73,7 @@
                     <div class="row justify-content-md-center">
                       <div class="col-md-3 my-4">
                         <div class="form-group">
-                          <button type="submit" class="btn btn-primary pull-right">Add Info</button>
+                          <button type="button" class="btn btn-primary pull-right" onclick="add_info()">Add Info</button>
                         </div>
                       </div>
                       <div class="col-md-3 my-4">
