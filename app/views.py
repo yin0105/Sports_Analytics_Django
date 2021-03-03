@@ -56,7 +56,29 @@ def set_sports(request):
 def set_settings(request):
     global current_sports
     print(request.GET["team"])
-    return redirect(current_page)
+    print(request.GET["sheet_id"])
+    print(request.GET["sheet_name"])
+    print(request.GET["rule"])
+    print(request.GET["victory"])
+    print(request.GET["settings_way"])
+
+    if request.GET["settings_way"] == "update" :
+        try:
+            print("current_sports = " + current_sports)
+            cur_sports = SportsURL.objects.get(sports=current_sports)
+            cur_sports.sports = request.GET["team"]
+            cur_sports.url = request.GET["sheet_id"]
+            cur_sports.sheet = request.GET["sheet_name"]
+            cur_sports.victory = request.GET["victory"]
+            cur_sports.rule = request.GET["rule"]
+            cur_sports.save()
+        except:
+            pass
+    elif request.GET["settings_way"] == "add" :
+        pass
+    current_sports = ""
+    get_sports_data()
+    return redirect('settings')
 
 
 @login_required(login_url="/login/")
@@ -273,6 +295,7 @@ def decision_winner():
 def get_sports_data():
     global sports_urls, sports_sheet, current_sports
     sports_urls_tmp = SportsURL.objects.all()
+    sports_urls.clear()
     for sports in sports_urls_tmp:
         if current_sports == "": current_sports = sports.sports
         sports_urls[sports.sports] = sports.url
