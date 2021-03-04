@@ -83,7 +83,7 @@ def dashboard(request):
         creds = None
         sheet_id =  sports_urls[current_sports]
         sheet_name =  sports_sheet[current_sports]
-        sheet_range =  "A1:I1000"
+        sheet_range =  "A1:I10000"
         if os.path.exists('token.pickle'):
             with open('token.pickle', 'rb') as token:
                 creds = pickle.load(token)
