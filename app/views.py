@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.template import loader
 from django.http import HttpResponse
 from django import template
@@ -38,7 +38,7 @@ def index(request):
 
 @login_required(login_url="/login/")
 def set_sports(request):
-    global current_sports
+    global current_sports, current_page
     current_sports = request.GET["sports"]
     return redirect(current_page)
 
@@ -145,7 +145,20 @@ def dashboard(request):
                     team_data.append(temp_team_data)
                     if len(team_data) == 2:
                         # Calc
-                        calc_data = [(float(team_data[0]["mean/avs"]) + float(team_data[1]["mean/avs"])) / 2, (float(team_data[0]["median"]) + float(team_data[1]["median"])) / 2, (float(team_data[0]["mode_aver"]) + float(team_data[1]["mode_aver"])) / 2, (float(team_data[0]["ta"]) + float(team_data[1]["ta"])) / 2]
+                        calc_data = []
+                        calc_data.append(float(team_data[0]["ta"]) + float(team_data[1]["ta"]))
+                        if len(team_data[0]["mode"]) == 0 or len(team_data[1]["mode"]) == 0:
+                            team_data = []
+                            continue
+                        elif len(team_data[0]["mode"]) == 1 and len(team_data[1]["mode"]) == 1:
+                            calc_data.append(float(team_data[0]["mean/avs"]) + float(team_data[1]["mean/avs"]))
+                            calc_data.append(float(team_data[0]["median"]) + float(team_data[1]["median"]))
+                            calc_data.append(float(team_data[0]["mode"][0]) + float(team_data[1]["mode"][0]))
+                        else:
+                            for i in team_data[0]["mode"]:
+                                for j in team_data[1]["mode"]:
+                                    calc_data.append(float(i) + float(j))
+                        
                         mode = calc_mode(calc_data)
                         mean = calc_mean(calc_data)
                         median = calc_median(calc_data)
@@ -166,9 +179,9 @@ def dashboard(request):
                         
                         temp_render_data["winner"] = ""
                         # rule
-                        if eval(sports_rule[current_sports]) :
-                            temp_render_data["winner"] = decision_winner(sports_victory[current_sports])
-
+                        if sports_rule[current_sports].strip() != "":
+                            if eval(sports_rule[current_sports]) :
+                                temp_render_data["winner"] = decision_winner(sports_victory[current_sports])
                         render_data.append(temp_render_data)
                         team_data = []
         context['segment'] = 'dashboard.html'
@@ -226,9 +239,7 @@ def calculator(request):
             # Median
             resp.append({"label":"Median:", "val":calc_median(que)})
             # Mode
-            print(calc_mode(que))
             temp = ', '.join([str(i) for i in calc_mode(que)])
-            print(temp)
             if temp == "": temp = "No"
             resp.append({"label":"Mode:", "val":temp})
             # Lowest value
