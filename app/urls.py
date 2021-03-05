@@ -11,7 +11,7 @@ urlpatterns = [
     path('dashboard', views.dashboard, name='dashboard'),
     path('settings', views.settings, name='settings'),
     path('calculator', views.calculator, name='calculator'),
+    path('kelly_calculator', views.kelly_calculator, name='kelly_calculator'),
     path('set_sports', views.set_sports, name='set_sports'),
     path('set_settings', views.set_settings, name='set_settings'),
-
 ]

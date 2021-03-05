@@ -178,6 +178,8 @@ def dashboard(request):
                         temp_render_data["score"] = "{:.2f}".format(c_score)
                         
                         temp_render_data["winner"] = ""
+                        calc_data_str = ["{:.2f}".format(i) for i in calc_data]
+                        temp_render_data["logic"] = ", ".join(calc_data_str)
                         # rule
                         if sports_rule[current_sports].strip() != "":
                             if eval(sports_rule[current_sports]) :
@@ -286,6 +288,14 @@ def calculator(request):
     context["resp"] = resp
     context["req"] = req
     html_template = loader.get_template( 'calculator.html' )
+    return HttpResponse(html_template.render(context, request))
+
+
+@login_required(login_url="/login/")
+def kelly_calculator(request):
+    context = {}
+    context['segment'] = 'kelly_calculator.html'
+    html_template = loader.get_template( 'kelly_calculator.html' )
     return HttpResponse(html_template.render(context, request))
     
 

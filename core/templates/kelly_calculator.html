@@ -1,0 +1,84 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Page User {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+          <div class="row justify-content-md-center">     
+            <div class="col-md-8">
+              <div class="card">
+                <div class="card-header card-header-primary">
+                  <h4 class="card-title">Kelly Criterion Bet Calculator</h4>
+                  <p class="card-category">this automatically calculates your ideal bet size with the Kelly Criterion and your assumptions.</p>
+                </div>
+                <div class="card-body mt-4">
+                  <form name="Mon Apr 16 2012 12:29:33 GMT-0700 (Pacific Daylight Time)">
+                    <table style="border: 1px solid #333333; margin-left: auto; margin-right: auto; width: 100%;" cellspacing="0">
+                      <tbody>
+                        <tr style="background: #333366;">
+                          <th style="text-align: center; vertical-align: center; font-size: larger; font-weight: bold; color: #ffffff; padding: 4px;" colspan="2">Kelly Criterion Input</th>
+                        </tr>
+                        <tr style="background: #9999CC;">
+                          <th style="text-align: left; vertical-align: center; font-weight: bold; padding: 4px;">Input Data</th>
+                          <th style="text-align: right; vertical-align: center; font-weight: bold; padding: 4px;">Values</th>
+                        </tr>
+                        <tr style="background: #FFFFFF;">
+                          <th style="text-align: left; vertical-align: center; font-weight: bold; padding: 4px;">Probability - Enter your odds of winning, say, '.5' for a coin flip, or '.1' for one number out of 10.</th>
+                          <td style="text-align: right; vertical-align: center; font-weight: bold; padding: 4px;"><input style="text-align: right; vertical-align: center;" name="PROB0" size="15" type="text" value=".5"></td>
+                        </tr>
+                        <tr style="background: #CCCCFF;">
+                          <th style="text-align: left; vertical-align: center; font-weight: bold; padding: 4px;">Odds - Enter your net odds received, say '2' for 2 to 1 odds.</th>
+                          <td style="text-align: right; vertical-align: center; font-weight: bold; padding: 4px;"><input style="text-align: right; vertical-align: center;" name="ODDS1" size="15" type="text" value="2"></td>
+                        </tr>
+                        <tr style="background: #FFFFFF;">
+                          <th style="text-align: left; vertical-align: center; font-weight: bold; padding: 4px;">Bankroll - Enter the amount of money you have to bet. (Dollars)</th>
+                          <td style="text-align: right; vertical-align: center; font-weight: bold; padding: 4px;"><input style="text-align: right; vertical-align: center;" name="BANK2" size="15" type="text" value="1000"></td>
+                        </tr>
+                        <tr style="background: #CCCCFF;">
+                          <th style="text-align: left; vertical-align: center; font-weight: bold; padding: 4px;">Adjusted Kelly - Enter Your 'Kelly Adjustment' to divide. '1' for full, '.5' for Half-Kelly, '.25' for Quarter-Kelly, etc.</th>
+                          <td style="text-align: right; vertical-align: center; font-weight: bold; padding: 4px;"><input style="text-align: right; vertical-align: center;" name="HK3" size="15" type="text" value="1"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  <br><br>
+                    <table style="border: none; margin-left: auto; margin-right: auto; width: 100%;" cellspacing="0">
+                      <tbody>
+                        <tr>
+                          <th style="text-align: center; vertical-align: center;"><input type="button" value="Calculate" onclick="kellyBet(this.form);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset"></th>
+                        </tr>
+                      </tbody>
+                    </table>
+                  <br><br>
+                    <table style="border: 1px solid #333333; margin-left: auto; margin-right: auto; width: 100%;" cellspacing="0">
+                      <tbody>
+                        <tr style="background: #3B3A4A;">
+                          <th style="text-align: center; vertical-align: center; font-size: larger; font-weight: bold; color: #ffffff; padding: 4px;" colspan="2">Kelly Criterion Calculation</th>
+                        </tr>
+                        <tr style="background: #768597;">
+                          <th style="text-align: left; vertical-align: center; font-weight: bold; padding: 4px;">Calculated Results</th>
+                          <th style="text-align: right; vertical-align: center; font-weight: bold; padding: 4px;">Values</th>
+                        </tr>
+                        <tr style="background: #FFFFFF;">
+                          <th style="text-align: left; vertical-align: center; font-weight: bold; padding: 4px;">Kelly Criterion (Adjusted)</th>
+                          <td style="text-align: right; vertical-align: center; padding: 4px;"><input style="text-align: right; vertical-align: center;" name="KC" size="15" type="text"></td>
+                        </tr>
+                        <tr style="background: #ECF1F4;">
+                          <th style="text-align: left; vertical-align: center; font-weight: bold; padding: 4px;">Bet This Much (Adjusted)</th>
+                          <td style="text-align: right; vertical-align: center; padding: 4px;"><input style="text-align: right; vertical-align: center;" name="F" size="15" type="text"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
